@@ -1,0 +1,150 @@
+#ECHO
+T
+
+#TEST
+krylov
+
+#PLANET
+NONE			NamePlanet
+
+#IOUNITS
+NONE			TypeIoUnit
+
+#NORMALIZATION
+NONE			TypeNormalization
+
+#PLASMA
+1.0			IonMass [amu]
+1.0			AverageIonCharge [e]
+1.0			ElectronTemperatureRatio
+
+#NONCONSERVATIVE
+F			UseNonConservative
+
+#CHECKGRIDSIZE
+10			nI
+10			nJ
+1			nK
+100			MinBlockALL
+
+#GRID
+4			nRootBlockX
+4			nRootBlockY
+1			nRootBlockZ
+-4.0			xMin
+ 4.0			xMax
+-4.0			yMin
+ 4.0			yMax
+-1.0			zMin
+ 1.0			zMax
+
+#GRIDLEVEL
+1                       nLevelArea
+box                     NameArea
+ 0.0                    xMinBox
+ 0.0                    yMinBox
+-1.0                    zMinBox
+ 2.0                    xMaxBox
+ 2.0                    yMaxBox
+ 1.0                    zMaxBox
+
+#GRIDLEVEL
+1                       nLevelArea
+box                     NameArea
+-2.0                    xMinBox
+-2.0                    yMinBox
+-1.0                    zMinBox
+ 0.0                    xMaxBox
+ 0.0                    yMaxBox
+ 1.0                    zMaxBox
+
+#GRIDLEVEL
+1                       nLevelArea
+initial                 NameArea
+
+#USERSWITCH
++init +ic +update	StringSwitch
+
+#USERINPUTBEGIN ------------------------
+
+#HEATCONDUCTIONTEST
+parcondsemi		TypeProblem
+
+#USERINPUTEND ----------------------------
+
+#SEMIIMPLICIT
+T			UseSemiImplicit
+parcond			TypeSemiImplicit
+
+#EXTRAINTERNALENERGY
+-1.0e30			ExtraEintMinSi
+
+#HEATCONDUCTION
+T			UseHeatConduction
+user			TypeHeatConduction
+
+#OUTERBOUNDARY
+user			TypeBcEast
+user			TypeBcWest
+user			TypeBcSouth
+user			TypeBcNorth
+reflect			TypeBcBottom
+reflect			TypeBcTop
+
+#SCHEME
+2			nOrder
+Linde			TypeFlux
+mc			TypeLimiter
+1.5			LimiterBeta
+
+#TIMESTEPPING
+1			nStage
+0.8			CflExpl
+
+#FIXEDTIMESTEP
+T			UseDtFixed
+1.0E-2			DtFixedDim
+
+#KRYLOV
+cg			TypeKrylov
+nul			TypeInitKrylov
+1.0e-8			ErrorMaxKrylov
+50			MaxMatvecKrylov
+
+#PRECONDITIONER
+left			TypePrecondSide (left, symmetric, right)
+bilu			TypePrecond (MBILU)
+
+#MESSAGEPASS
+all			TypeMessagePass
+
+#RESCHANGE
+T			UseAccurateResChange
+
+#SAVELOGFILE
+T			DoSaveLogfile
+raw			StringLogfile
+1			DnSaveLogfile
+-1.			DtSaveLogfile
+
+#SAVERESTART
+F			DoSaveRestart
+
+#SAVEINITIAL
+T			DoSaveInitial
+
+#SAVEPLOT
+1			nPlotfile
+z=0 VAR idl		PlotString
+-1			DnSavePlot
+0.1			DtSavePlot
+-1.0			DxSavePlot
+te te0 bx by
+g
+
+#TIMESIMULATION
+0.1			tSimulation
+
+#STOP
+-1			MaxIteration
+0.3			tSimulationMax
