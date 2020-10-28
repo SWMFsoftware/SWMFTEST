@@ -6,6 +6,7 @@
 test: 
 	@rm -f output/*.diff
 	-@(make test_parcondsemi)
+	-@(make test_parcondsemi_sph)
 	@ls -l output/*.diff
 
 # Path to this test directory from the main directory
@@ -31,6 +32,7 @@ help:
 	@echo "    test MPIRUN='mpirun -np 3' (run test with mpirun -np 3)"
 	@echo "    test MPIRUN='mprun -np 2'  (run test with mprun -np 2)"
 	@echo "    test_parcondsemi           (run heat conduction test with semi-implicit scheme)"
+	@echo "    test_parcondsemi_sph       (run semi-implicit spherical heat cond. test)"
 
 
 test_rundir:
@@ -83,6 +85,51 @@ test_parcondsemi_check:
 		output/test_parcondsemi.ref \
 		> output/test_parcondsemi.diff)
 	ls -l output/test_parcondsemi.diff
+
+### Heat conduction test in 3D spherical with uniform diffusion coefficient ###
+
+test_parcondsemi_sph:
+	@echo "test_parcondsemi_sph_compile..." > output/test_parcondsemi_sph.diff
+	make test_parcondsemi_sph_compile
+	@echo "test_parcondsemi_sph_rundir..." >> output/test_parcondsemi_sph.diff
+	make test_parcondsemi_sph_rundir
+	@echo "test_parcondsemi_sph_run..." >> output/test_parcondsemi_sph.diff
+	make test_parcondsemi_sph_run
+	@echo "test_parcondsemi_sph_check..." >> output/test_parcondsemi_sph.diff
+	make test_parcondsemi_sph_check
+
+test_parcondsemi_sph_compile:
+	cd ${DIR}; ./Config.pl -u=HeatConduction -e=MhdEosRad -g=4,4,4
+	cd ${DIR}; make BATSRUS PIDL
+
+test_parcondsemi_sph_rundir: test_rundir
+	cp input/PARAM.in.parcondsemi_sph ${DIR}/${RUNDIR}/PARAM.in
+
+test_parcondsemi_sph_run:
+	make test_parcondsemi_sph_run_res RES=8
+	make test_parcondsemi_sph_run_res RES=16
+	make test_parcondsemi_sph_run_res RES=32
+	rm -rf output/test_parcondsemi_sph_results
+	mv ${DIR}/${RUNDIR}/RESULTS output/test_parcondsemi_sph_results
+
+test_parcondsemi_sph_run_res:
+	cd ${DIR}/${RUNDIR}; \
+		perl -pi -e '$$a=${RES}/8; s/\S+(\s*nRootBlockX)/$$a$$1/' PARAM.in;\
+		perl -pi -e '$$a=${RES}/4; s/\S+(\s*nRootBlockY)/$$a$$1/' PARAM.in;\
+		perl -pi -e '$$a=${RES}/8; s/\S+(\s*nRootBlockZ)/$$a$$1/' PARAM.in;\
+		perl -pi -e '$$a=2.0E-3*16/${RES}; s/\S+(\s*DtFixedDim)/$$a$$1/' PARAM.in
+	cd ${DIR}/${RUNDIR}; \
+		${MPIRUN} ./BATSRUS.exe > runlog; \
+		PostProc.pl -M RESULTS/${RES}
+
+test_parcondsemi_sph_check:
+	cd output; idl test_parcondsemi_sph.pro; \
+		rm -f test_parcondsemi_sph_results/*.eps
+	-(${SCRIPTDIR}/DiffNum.pl -a=1e-4 \
+		output/test_parcondsemi_sph_results/error.dat \
+		output/test_parcondsemi_sph.ref \
+		> output/test_parcondsemi_sph.diff)
+	ls -l output/test_parcondsemi_sph.diff
 
 
 clean:

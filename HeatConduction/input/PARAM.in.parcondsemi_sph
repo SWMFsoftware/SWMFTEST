@@ -1,0 +1,161 @@
+
+#ECHO
+T
+
+#PLANET
+NONE			NamePlanet
+
+#IOUNITS
+NONE			TypeIoUnit
+
+#PLASMA
+1.0			IonMass [amu]
+1.0			AverageIonCharge [e]
+1.0			ElectronTemperatureRatio
+
+#NORMALIZATION
+NONE
+
+#NONCONSERVATIVE
+F			UseNonConservative
+
+#CHECKGRIDSIZE
+4			nI
+4			nJ
+4			nK
+100			MinBlockALL
+
+#GRIDGEOMETRY
+spherical		TypeGeometry
+
+#GRID
+1			nRootBlockX
+2			nRootBlockY
+1			nRootBlockZ
+-5.0			xMin
+ 5.0			xMax
+-5.0			yMin
+ 5.0			yMax
+-5.0			zMin
+ 5.0			zMax
+
+#LIMITRADIUS
+1.0
+4.
+
+#GRIDLEVEL
+1			nLevelArea
+initial			NameArea
+
+#GRIDLEVEL
+1
+all
+
+#COARSEAXIS
+T                       UseCoarseAxis
+2                       nCoarseLayer
+
+#USERSWITCH
++init +ic +update       StringSwitch
+
+#USERINPUTBEGIN ------------------------
+
+#HEATCONDUCTIONTEST
+parcondsemi		TypeProblem
+
+#PARCONDSEMIINIT
+1.7	BxInput
+1.0	ByInput
+0.	xCenterGuassian
+0.5	yCenterGaussian
+
+#USERINPUTEND ----------------------------
+
+#SEMIIMPLICIT
+T			UseSemiImplicit
+parcond			TypeSemiImplicit
+
+#EXTRAINTERNALENERGY
+-1.0e30			ExtraEintMinSi
+
+#HEATCONDUCTION
+T			UseHeatConduction
+user			TypeHeatConduction
+
+#OUTERBOUNDARY
+user			TypeBcEast
+user			TypeBcWest
+float			TypeBcSouth
+float  			TypeBcNorth
+float			TypeBcBottom
+float			TypeBcTop
+
+#SCHEME
+2			nOrder
+Linde			TypeFlux
+mc			TypeLimiter
+1.5			LimiterBeta
+
+#TIMESTEPPING
+1			nStage
+0.8			CflExpl
+
+#UPDATECHECK
+F			UseUpdateCheck
+
+#FIXEDTIMESTEP
+T			UseDtFixed
+1.0E-2			DtFixedDim
+
+#KRYLOV
+gmres			TypeKrylov
+nul			TypeInitKrylov
+1.0e-8			ErrorMaxKrylov
+100			MaxMatvecKrylov
+
+#PRECONDITIONER
+left			TypePrecondSide (left, symmetric, right)
+bilu			TypePrecond (MBILU)
+
+#MESSAGEPASS
+all			TypeMessagePass
+
+#SAVELOGFILE
+T			DoSaveLogfile
+raw			StringLogfile
+1			DnSaveLogfile
+-1.			DtSaveLogfile
+
+#SAVERESTART
+F			DoSaveRestart
+
+#SAVEINITIAL
+T			DoSaveInitial
+
+#SAVEPLOT
+3			nPlotfile
+z=0 VAR idl             PlotString
+-1                      DnSavePlot
+0.1                     DtSavePlot
+-1.0                    DxSavePlot
+te te0 bx by
+g
+y=0 VAR idl             PlotString
+-1                      DnSavePlot
+0.1                     DtSavePlot
+-1.0                    DxSavePlot
+te te0 bx by
+g
+x=0 VAR idl             PlotString
+-1                      DnSavePlot
+0.1                     DtSavePlot
+-1.0                    DxSavePlot
+te te0 bx by
+g
+
+#TIMESIMULATION
+0.1                     tSimulation
+
+#STOP
+-1			MaxIteration
+0.3			tSimulationMax
